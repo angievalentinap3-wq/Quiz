@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#24113d">
+<title>Operación: cumpleaños perfecto 🎂</title>
+<style>
+:root{
+ --bg:#f8f5fc;--card:#fff;--ink:#292333;--muted:#756d80;
+ --purple:#7337d8;--pink:#e94b91;--line:#e9e3ef;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#f0e5ff 0,#fff5f8 35%,#fafafa 100%);
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+main{max-width:720px;margin:auto;padding:14px 13px 55px}
+.hero{margin-top:4px;border-radius:30px;padding:29px 21px 25px;background:linear-gradient(145deg,#211034,#7135d4 62%,#df438b);color:#fff;box-shadow:0 18px 45px #57308024}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.7px;opacity:.75;font-weight:800}
+h1{font-size:clamp(31px,8vw,50px);line-height:1.02;margin:9px 0 12px}
+.hero p{line-height:1.5;margin:0;color:#f5efff}
+.progress{display:flex;align-items:center;gap:10px;margin:15px 3px 5px;color:#71697b;font-size:12px;font-weight:700}
+.bar{height:7px;flex:1;background:#ebe5f0;border-radius:99px;overflow:hidden}.fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:99px;transition:.25s}
+.card{background:#fff;border:1px solid var(--line);border-radius:25px;padding:21px 16px;margin-top:12px;box-shadow:0 9px 28px #3b20510b}
+.kicker{font-size:12px;font-weight:800;color:#8051c4;text-transform:uppercase;letter-spacing:.6px}
+h2{font-size:24px;line-height:1.15;margin:7px 0 8px}.desc{color:var(--muted);line-height:1.5;margin:0 0 15px}
+.tip{background:#f6f0ff;color:#67419a;border-radius:15px;padding:11px 12px;font-size:13px;line-height:1.4;margin-bottom:12px}
+.rank{display:flex;flex-direction:column;gap:9px}
+.item{border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px 10px;display:flex;align-items:center;gap:9px;cursor:grab;touch-action:none;box-shadow:0 2px 6px #38214b08}
+.item.dragging{opacity:.45}.handle{color:#aaa;font-size:18px}.num{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#f0e8ff;color:#6732bf;font-size:12px;font-weight:800;flex:none}.label{line-height:1.3}
+.option{border:1px solid var(--line);border-radius:16px;padding:13px 12px;margin:8px 0;display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.option input{accent-color:var(--purple);width:19px;height:19px;flex:none;margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:9px}.tag{border:1px solid var(--line);border-radius:999px;padding:10px 12px;background:#fff;cursor:pointer;line-height:1.25}.tag.on{background:#efe6ff;border-color:#c7a8ff;color:#6331b7;font-weight:800}
+.actions{display:flex;justify-content:space-between;gap:9px;margin-top:17px}.btn{border:0;border-radius:15px;padding:13px 17px;font-size:15px;font-weight:800;cursor:pointer}.back{background:#f0edf4;color:#51495b}.next{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;flex:1}
+.result{overflow:hidden}.big{font-size:42px;margin:0}.resultbox{white-space:pre-wrap;background:#faf8fd;border:1px solid var(--line);padding:15px;border-radius:18px;font-size:13px;line-height:1.55;max-height:55vh;overflow:auto}
+.small{text-align:center;color:#8b8391;font-size:11px;margin-top:17px}
+.shake{animation:shake .25s}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div class="eyebrow">Una investigación completamente seria 🔎</div>
+<h1 id="title"></h1>
+<p id="subtitle"></p>
+</section>
+<div class="progress"><span id="ptext"></span><div class="bar"><div class="fill" id="fill"></div></div></div>
+<div id="app"></div>
+<div class="small">Responde según lo que realmente te provoque. 👀</div>
+</main>
+
+<script src="config.js"></script>
+<script>
+const cfg=QUIZ_CONFIG, app=document.getElementById("app"), ptext=document.getElementById("ptext"), fill=document.getElementById("fill");
+document.getElementById("title").textContent=cfg.title;
+document.getElementById("subtitle").textContent=cfg.subtitle+" "+cfg.intro;
+let step=0,ans={};
+
+function render(){
+ const total=cfg.sections.length;
+ ptext.textContent=step<total?`Pregunta ${step+1} de ${total}`:"¡Investigación completada!";
+ fill.style.width=(step/total*100)+"%";
+ if(step>=total){result();return}
+ const s=cfg.sections[step], card=document.createElement("section");card.className="card";
+ card.innerHTML=`<div class="kicker">${s.emoji} ${step+1} / ${total}</div><h2>${s.title}</h2><p class="desc">${s.description}</p>`;
+ if(s.type==="rank")card.appendChild(rank(s));
+ if(s.type==="multi")card.appendChild(multi(s));
+ if(s.type==="single")card.appendChild(single(s));
+ const actions=document.createElement("div");actions.className="actions";
+ if(step>0){let b=document.createElement("button");b.className="btn back";b.textContent="←";b.onclick=()=>{step--;render();scrollTo(0,0)};actions.appendChild(b)}
+ let n=document.createElement("button");n.className="btn next";n.textContent=step===total-1?"Terminar ✨":"Siguiente →";n.onclick=()=>go(s);actions.appendChild(n);
+ card.appendChild(actions);app.innerHTML="";app.appendChild(card);scrollTo({top:0,behavior:"smooth"});
+}
+function rank(s){
+ const w=document.createElement("div"),tip=document.createElement("div");tip.className="tip";tip.textContent="☝️ "+s.instruction;w.appendChild(tip);
+ const l=document.createElement("div");l.className="rank";let order=ans[s.id]||s.options.map((_,i)=>i);
+ order.forEach(i=>l.appendChild(makeItem(s.options[i],i,l)));w.appendChild(l);return w;
+}
+function makeItem(txt,i,l){
+ const e=document.createElement("div");e.className="item";e.draggable=true;e.dataset.i=i;
+ e.innerHTML=`<span class="handle">☰</span><span class="num"></span><span class="label">${txt}</span>`;
+ e.addEventListener("dragstart",()=>e.classList.add("dragging"));
+ e.addEventListener("dragend",()=>{e.classList.remove("dragging");nums(l)});
+ e.addEventListener("dragover",ev=>{ev.preventDefault();const d=l.querySelector(".dragging");if(!d||d===e)return;const r=e.getBoundingClientRect();l.insertBefore(d,ev.clientY>r.top+r.height/2?e.nextSibling:e);nums(l)});
+ return e;
+}
+function nums(l){[...l.children].forEach((e,i)=>e.querySelector(".num").textContent=i+1)}
+function multi(s){
+ const w=document.createElement("div");w.className="tags";const selected=ans[s.id]||[];
+ s.options.forEach((txt,i)=>{let t=document.createElement("div");t.className="tag"+(selected.includes(i)?" on":"");t.textContent=txt;t.onclick=()=>{let a=ans[s.id]||[];if(a.includes(i)){a=a.filter(x=>x!==i);t.classList.remove("on")}else if(a.length<(s.max||3)){a=[...a,i];t.classList.add("on")}else{alert("Máximo "+(s.max||3)+" opciones 😉");return}ans[s.id]=a};w.appendChild(t)});return w;
+}
+function single(s){
+ const w=document.createElement("div");s.options.forEach((txt,i)=>{let l=document.createElement("label");l.className="option";l.innerHTML=`<input type="radio" name="${s.id}" ${ans[s.id]===i?"checked":""}><span>${txt}</span>`;l.querySelector("input").onchange=()=>ans[s.id]=i;w.appendChild(l)});return w;
+}
+function go(s){
+ if(s.type==="rank"){const l=document.querySelector(".rank");ans[s.id]=[...l.children].map(e=>+e.dataset.i)}
+ if(s.type==="single" && ans[s.id]===undefined)return warn();
+ if(s.type==="multi" && !(ans[s.id]&&ans[s.id].length))return warn();
+ step++;render();
+}
+function warn(){const c=document.querySelector(".card");c.classList.add("shake");setTimeout(()=>c.classList.remove("shake"),300);alert("Escoge al menos una opción antes de continuar 💜")}
+function result(){
+ let out="🎂 OPERACIÓN CUMPLEAÑOS PERFECTO 🎂\\n\\n";
+ cfg.sections.forEach(s=>{out+=s.emoji+" "+s.title+"\\n";let a=ans[s.id];
+ if(s.type==="rank")a.forEach((i,n)=>out+=`${n+1}. ${s.options[i]}\\n`);
+ else if(s.type==="multi")a.forEach(i=>out+=`• ${s.options[i]}\\n`);
+ else out+=`• ${s.options[a]}\\n`;out+="\\n"});
+ app.innerHTML=`<section class="card result"><p class="big">🥳</p><h2>¡Caso cerrado!</h2><p class="desc">Tus respuestas quedaron listas. Ahora solo falta que la persona sospechosamente interesada en tus gustos las reciba. 👀</p><div class="resultbox" id="out"></div><div class="actions"><button class="btn back" id="copy">📋 Copiar</button><button class="btn next" id="wa">💬 WhatsApp</button></div></section>`;
+ document.getElementById("out").textContent=out;
+ document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(out);alert("¡Copiado! 💜")}catch(e){alert("Selecciona y copia el texto manualmente.")}};
+ document.getElementById("wa").onclick=()=>location.href="https://wa.me/?text="+encodeURIComponent(out);
+}
+render();
+</script>
+</body>
+</html>
