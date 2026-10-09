@@ -1,3 +1,5 @@
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAKb8mgbx8OmitzgnmlI9lrd3adZSaaDbjuYMwHDKAUcbeqsoCN1MUJcjzC8NMuBZp/exec";
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -55,20 +57,63 @@ document.getElementById("title").textContent=cfg.title;
 document.getElementById("subtitle").textContent=cfg.subtitle+" "+cfg.intro;
 let step=0,ans={};
 
-function render(){
- const total=cfg.sections.length;
- ptext.textContent=step<total?`Pregunta ${step+1} de ${total}`:"¡Investigación completada!";
- fill.style.width=(step/total*100)+"%";
- if(step>=total){result();return}
- const s=cfg.sections[step], card=document.createElement("section");card.className="card";
- card.innerHTML=`<div class="kicker">${s.emoji} ${step+1} / ${total}</div><h2>${s.title}</h2><p class="desc">${s.description}</p>`;
- if(s.type==="rank")card.appendChild(rank(s));
- if(s.type==="multi")card.appendChild(multi(s));
- if(s.type==="single")card.appendChild(single(s));
- const actions=document.createElement("div");actions.className="actions";
- if(step>0){let b=document.createElement("button");b.className="btn back";b.textContent="←";b.onclick=()=>{step--;render();scrollTo(0,0)};actions.appendChild(b)}
- let n=document.createElement("button");n.className="btn next";n.textContent=step===total-1?"Terminar ✨":"Siguiente →";n.onclick=()=>go(s);actions.appendChild(n);
- card.appendChild(actions);app.innerHTML="";app.appendChild(card);scrollTo({top:0,behavior:"smooth"});
+
+async function renderResult() {
+  app.innerHTML = `
+    <section class="card result">
+      <h2>Enviando tus respuestas... 💜</h2>
+      <p>Un momentico, estamos terminando.</p>
+    </section>
+  `;
+
+  const datos = { answers: {} };
+
+  cfg.sections.forEach(s => {
+    const respuesta = answers[s.id];
+
+    if (s.type === "rank") {
+      datos.answers[s.title] =
+        respuesta.map(i => s.options[i]);
+    } else if (s.type === "multi") {
+      datos.answers[s.title] =
+        respuesta.map(i => s.options[i]);
+    } else {
+      datos.answers[s.title] =
+        s.options[respuesta];
+    }
+  });
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(datos)
+    });
+
+    app.innerHTML = `
+      <section class="card result">
+        <h2>¡Investigación completada! 🥳</h2>
+        <p>
+          Gracias por participar.
+          ¡Tus respuestas quedaron registradas! 💜
+        </p>
+      </section>
+    `;
+
+  } catch (error) {
+    app.innerHTML = `
+      <section class="card result">
+        <h2>Ups, ocurrió un problema 😕</h2>
+        <p>
+          No pudimos enviar las respuestas.
+          Inténtalo de nuevo más tarde.
+        </p>
+      </section>
+    `;
+  }
 }
 function rank(s){
  const w=document.createElement("div"),tip=document.createElement("div");tip.className="tip";tip.textContent="☝️ "+s.instruction;w.appendChild(tip);
