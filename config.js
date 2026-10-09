@@ -55,22 +55,22 @@ const QUIZ_CONFIG = {
         "🤷 Caminar por ahí y perdernos un rato"
       ]
     },
-
+    
     {
       id: "movies",
       emoji: "🍿",
-      title: "Bueno esto es por si marcaste como un plan chevere ir a cine, 
+      title: "Bueno, esto es por si marcaste como un plan chévere ir a cine",
       description: "Si aparecieran estas películas en cartelera, ¿cuáles te llamarían la atención? Puedes escoger hasta 3.",
-      description: "",
       type: "multi",
+      instruction: "¿Cuáles te gustarían? Puedes escoger hasta 3 y tranqui, que obvio no incluí de terror.",
       max: 3,
       options: [
         "🐺 El Corazón de la Bestia — Acción / aventura - Dicen q es pa llorar",
-        "🦸 Avengers: Endgame Bon — Acción / ciencia ficción - por si quieres repetir la peli",
+        "🦸 Avengers: Endgame Bon — Acción / ciencia ficción - Por si quieres repetir la peli",
         "🖤 Verity — Misterio / suspenso - Tiene buen cast de actores",
-        "🐺 Coyote vs. ACME — Comedia / aventura - por nostalgia de cartoon",
+        "🐺 Coyote vs. ACME — Comedia / aventura - Por nostalgia de cartoon",
         "😱 Vértigo 2: Punto Muerto — Suspenso - Es literalmente de que puede dar vértigo por altura",
-        "😱 Pacifico: Drama - El cartel tiene mar y barcos",
+        "😱 Pacífico: Drama - El cartel tiene mar y barcos"
       ]
     },
   ]
