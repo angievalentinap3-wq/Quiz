@@ -60,7 +60,7 @@ const QUIZ_CONFIG = {
       id: "movies",
       emoji: "🍿",
       title: "Bueno, esto es por si marcaste como un plan chévere ir a cine",
-      description: "Si aparecieran estas películas en cartelera, ¿cuáles te llamarían la atención? Puedes escoger hasta 3.",
+      description: "",
       type: "multi",
       instruction: "¿Cuáles te gustarían? Puedes escoger hasta 3 y tranqui, que obvio no incluí de terror.",
       max: 3,
