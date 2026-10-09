@@ -26,7 +26,7 @@ const QUIZ_CONFIG = {
       title: "Teniendo en cuenta tu sistema gastrointestinal reciente, piensa qué quieres comer este finde",
       description: "",
       type: "rank",
-      instruction: "Ordénalas de más antojada a menos antojada.",
+      instruction: "Según tus antojos...",
       options: [
         "🌮 Mexicano",
         "🍝 Pastas / comida italiana",
