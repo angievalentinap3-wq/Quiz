@@ -63,7 +63,6 @@ const QUIZ_CONFIG = {
       description: "Si aparecieran estas películas en cartelera, ¿cuáles te llamarían la atención? Puedes escoger hasta 3.",
       description: "",
       type: "multi",
-      instruction: "cuáles te gustarían? Puedes escoger hasta 3 y tranqui que obvio no incluí de terror",
       max: 3,
       options: [
         "🐺 El Corazón de la Bestia — Acción / aventura - Dicen q es pa llorar",
