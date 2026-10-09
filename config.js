@@ -16,7 +16,7 @@ const QUIZ_CONFIG = {
         "🏠 Plan casita: juegos + comida + algo para tomar",
         "🎬 Ir a cineeeeee",
         "🛍️ Salir de compritass por ahí",
-        "🍽️ Irnos a comer por fueraaa"
+        "🍽️ Irnos a comer por fueraaa",
       ]
     },
 
@@ -26,7 +26,7 @@ const QUIZ_CONFIG = {
       title: "Teniendo en cuenta tu sistema gastrointestinal reciente, piensa qué quieres comer este finde",
       description: "",
       type: "rank",
-      instruction: "Según tus antojos...",
+      instruction: "Según tus antojos",
       options: [
         "🌮 Mexicano",
         "🍝 Pastas / comida italiana",
