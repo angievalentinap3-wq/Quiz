@@ -15,7 +15,6 @@ const QUIZ_CONFIG = {
         "💃 Tomar en un barcito, puede terminar en nuestra primera rumba juntas solas",
         "🏠 Plan casita: juegos + comida + algo para tomar",
         "🎬 Ir a cineeeeee",
-        "🛍️ Salir de compritass por ahí",
         "🍽️ Irnos a comer por fueraaa",
       ]
     },
@@ -49,8 +48,7 @@ const QUIZ_CONFIG = {
         "🍸 Barcito para hablar y tomar algo",
         "💃 Discotequear juntas",
         "🏠 Plan casita: juegos + comida + algo para tomar",
-        "🎬 Cineeeeee otra vez jajajajaja",
-        "🛍️ Día/tarde de compras",
+        "🎬 Cineeeeee",
         "☕ Brunch o café tranquilo",
         "🤷 Caminar por ahí y perdernos un rato"
       ]
