@@ -1,6 +1,7 @@
 
+<script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAKb8mgbx8OmitzgnmlI9lrd3adZSaaDbjuYMwHDKAUcbeqsoCN1MUJcjzC8NMuBZp/exec";
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -143,17 +144,46 @@ function go(s){
  step++;render();
 }
 function warn(){const c=document.querySelector(".card");c.classList.add("shake");setTimeout(()=>c.classList.remove("shake"),300);alert("Escoge al menos una opción antes de continuar 💜")}
-function result(){
- let out="🎂 OPERACIÓN CUMPLEAÑOS PERFECTO 🎂\\n\\n";
- cfg.sections.forEach(s=>{out+=s.emoji+" "+s.title+"\\n";let a=ans[s.id];
- if(s.type==="rank")a.forEach((i,n)=>out+=`${n+1}. ${s.options[i]}\\n`);
- else if(s.type==="multi")a.forEach(i=>out+=`• ${s.options[i]}\\n`);
- else out+=`• ${s.options[a]}\\n`;out+="\\n"});
- app.innerHTML=`<section class="card result"><p class="big">🥳</p><h2>¡Caso cerrado!</h2><p class="desc">Tus respuestas quedaron listas. Ahora solo falta que la persona sospechosamente interesada en tus gustos las reciba. 👀</p><div class="resultbox" id="out"></div><div class="actions"><button class="btn back" id="copy">📋 Copiar</button><button class="btn next" id="wa">💬 WhatsApp</button></div></section>`;
- document.getElementById("out").textContent=out;
- document.getElementById("copy").onclick=async()=>{try{await navigator.clipboard.writeText(out);alert("¡Copiado! 💜")}catch(e){alert("Selecciona y copia el texto manualmente.")}};
- document.getElementById("wa").onclick=()=>location.href="https://wa.me/?text="+encodeURIComponent(out);
+
+
+async function result() {
+  app.innerHTML = `
+    <section class="card result">
+      <p class="big">💜</p>
+      <h2>¡Gracias por responder!</h2>
+      <p class="desc">
+        ¡Investigación completada! 🥳
+        Gracias por ayudar a que el cumpleaños sea especial.
+      </p>
+    </section>
+  `;
+
+  const datos = { answers: {} };
+
+  cfg.sections.forEach(s => {
+    const respuesta = ans[s.id];
+
+    if (s.type === "rank" || s.type === "multi") {
+      datos.answers[s.title] = respuesta.map(i => s.options[i]);
+    } else {
+      datos.answers[s.title] = s.options[respuesta];
+    }
+  });
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(datos)
+    });
+  } catch (error) {
+    console.error("No se pudieron enviar las respuestas", error);
+  }
 }
+ 
 render();
 </script>
 </body>
