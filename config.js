@@ -16,7 +16,8 @@ const QUIZ_CONFIG = {
         "🏠 Plan casita: juegos + comida + algo para tomar",
         "🎬 Ir a cineeeeee",
         "🛍️ Salir de compritass por ahí",
-        "🍽️ Irnos a comer por fueraaa"
+        "🍽️ Irnos a comer por fueraaa",
+        "💃 Todas las opciones jajajajajaja"
       ]
     },
 
@@ -34,7 +35,8 @@ const QUIZ_CONFIG = {
         "🍔 Hamburguesa o perrito",
         "🥘 Algo pa picarrr",
         "🥗 Algo sencillo o ligero",
-        "🍰 Brunchito"
+        "🍰 Brunchito",
+        "💃 Todas las opciones jajajajajaja"
       ]
     },
 
@@ -44,7 +46,7 @@ const QUIZ_CONFIG = {
       title: "Planes pa mañanaaa",
       description: "",
       type: "rank",
-      instruction: "Ordena en orden según el plan que más te emocionaría.",
+      instruction: "Ordena según el plan que más te emocionaría.",
       options: [
         "🍸 Barcito para hablar y tomar algo",
         "💃 Discotequear juntas",
@@ -52,7 +54,8 @@ const QUIZ_CONFIG = {
         "🎬 Cineeeeee otra vez jajajajaja",
         "🛍️ Día/tarde de compras",
         "☕ Brunch o café tranquilo",
-        "🤷 Caminar por ahí y perdernos un rato"
+        "🤷 Caminar por ahí y perdernos un rato",
+        "💃 Todas las opciones jajajajajaja"
       ]
     },
     
