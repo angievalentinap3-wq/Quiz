@@ -1,7 +1,4 @@
-
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAKb8mgbx8OmitzgnmlI9lrd3adZSaaDbjuYMwHDKAUcbeqsoCN1MUJcjzC8NMuBZp/exec";
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -52,101 +49,235 @@ h2{font-size:24px;line-height:1.15;margin:7px 0 8px}.desc{color:var(--muted);lin
 </main>
 
 <script src="config.js"></script>
+
 <script>
-const cfg=QUIZ_CONFIG, app=document.getElementById("app"), ptext=document.getElementById("ptext"), fill=document.getElementById("fill");
-document.getElementById("title").textContent=cfg.title;
-document.getElementById("subtitle").textContent=cfg.subtitle+" "+cfg.intro;
-let step=0,ans={};
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAKb8mgbx8OmitzgnmlI9lrd3adZSaaDbjuYMwHDKAUcbeqsoCN1MUJcjzC8NMuBZp/exec";
 
+const cfg = QUIZ_CONFIG;
+const app = document.getElementById("app");
+const ptext = document.getElementById("ptext");
+const fill = document.getElementById("fill");
 
-async function render() {
-  app.innerHTML = `
-    <section class="card result">
-      <h2>Enviando tus respuestas... 💜</h2>
-      <p>Un momentico, estamos terminando.</p>
-    </section>
-  `;
+document.getElementById("title").textContent = cfg.title;
+document.getElementById("subtitle").textContent = cfg.subtitle + " " + cfg.intro;
 
-  const datos = { answers: {} };
+let step = 0;
+let ans = {};
 
-  cfg.sections.forEach(s => {
-    const respuesta = answers[s.id];
+function render() {
+  if (step >= cfg.sections.length) {
+    result();
+    return;
+  }
 
-    if (s.type === "rank") {
-      datos.answers[s.title] =
-        respuesta.map(i => s.options[i]);
-    } else if (s.type === "multi") {
-      datos.answers[s.title] =
-        respuesta.map(i => s.options[i]);
-    } else {
-      datos.answers[s.title] =
-        s.options[respuesta];
-    }
+  const s = cfg.sections[step];
+  ptext.textContent = `Pregunta ${step + 1} de ${cfg.sections.length}`;
+  fill.style.width = `${((step + 1) / cfg.sections.length) * 100}%`;
+
+  app.innerHTML = "";
+
+  const card = document.createElement("section");
+  card.className = "card";
+
+  const kicker = document.createElement("div");
+  kicker.className = "kicker";
+  kicker.textContent = s.emoji || "💜";
+
+  const heading = document.createElement("h2");
+  heading.textContent = s.title;
+
+  const desc = document.createElement("p");
+  desc.className = "desc";
+  desc.textContent = s.instruction || "";
+
+  card.append(kicker, heading, desc);
+
+  let choices;
+
+  if (s.type === "rank") {
+    choices = rank(s);
+  } else if (s.type === "multi") {
+    choices = multi(s);
+  } else {
+    choices = single(s);
+  }
+
+  card.appendChild(choices);
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+
+  if (step > 0) {
+    const back = document.createElement("button");
+    back.className = "btn back";
+    back.textContent = "← Anterior";
+    back.onclick = () => {
+      saveCurrent(s);
+      step--;
+      render();
+    };
+    actions.appendChild(back);
+  }
+
+  const next = document.createElement("button");
+  next.className = "btn next";
+  next.textContent = step === cfg.sections.length - 1
+    ? "Terminar 💜"
+    : "Siguiente →";
+  next.onclick = () => go(s);
+
+  actions.appendChild(next);
+  card.appendChild(actions);
+  app.appendChild(card);
+}
+
+function rank(s) {
+  const wrap = document.createElement("div");
+  const tip = document.createElement("div");
+  tip.className = "tip";
+  tip.textContent = "☝️ Arrastra para ordenar tus preferencias.";
+  wrap.appendChild(tip);
+
+  const list = document.createElement("div");
+  list.className = "rank";
+
+  const order = ans[s.id] || s.options.map((_, i) => i);
+  order.forEach(i => list.appendChild(makeItem(s.options[i], i, list)));
+  nums(list);
+  wrap.appendChild(list);
+  return wrap;
+}
+
+function makeItem(txt, i, list) {
+  const el = document.createElement("div");
+  el.className = "item";
+  el.draggable = true;
+  el.dataset.i = i;
+
+  const handle = document.createElement("span");
+  handle.className = "handle";
+  handle.textContent = "☰";
+
+  const number = document.createElement("span");
+  number.className = "num";
+
+  const label = document.createElement("span");
+  label.className = "label";
+  label.textContent = txt;
+
+  el.append(handle, number, label);
+
+  el.addEventListener("dragstart", () => el.classList.add("dragging"));
+  el.addEventListener("dragend", () => {
+    el.classList.remove("dragging");
+    nums(list);
   });
 
-  try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
-      body: JSON.stringify(datos)
-    });
+  el.addEventListener("dragover", ev => {
+    ev.preventDefault();
+    const dragged = list.querySelector(".dragging");
+    if (!dragged || dragged === el) return;
+    const r = el.getBoundingClientRect();
+    list.insertBefore(
+      dragged,
+      ev.clientY > r.top + r.height / 2 ? el.nextSibling : el
+    );
+    nums(list);
+  });
 
-    app.innerHTML = `
-      <section class="card result">
-        <h2>¡Investigación completada! 🥳</h2>
-        <p>
-          Gracias por participar.
-          ¡Tus respuestas quedaron registradas! 💜
-        </p>
-      </section>
-    `;
+  return el;
+}
 
-  } catch (error) {
-    app.innerHTML = `
-      <section class="card result">
-        <h2>Ups, ocurrió un problema 😕</h2>
-        <p>
-          No pudimos enviar las respuestas.
-          Inténtalo de nuevo más tarde.
-        </p>
-      </section>
-    `;
+function nums(list) {
+  [...list.children].forEach((el, i) => {
+    el.querySelector(".num").textContent = i + 1;
+  });
+}
+
+function multi(s) {
+  const wrap = document.createElement("div");
+  wrap.className = "tags";
+  const selected = ans[s.id] || [];
+
+  s.options.forEach((txt, i) => {
+    const tag = document.createElement("button");
+    tag.type = "button";
+    tag.className = "tag" + (selected.includes(i) ? " on" : "");
+    tag.textContent = txt;
+
+    tag.onclick = () => {
+      let values = ans[s.id] || [];
+
+      if (values.includes(i)) {
+        values = values.filter(x => x !== i);
+      } else if (values.length < (s.max || 3)) {
+        values = [...values, i];
+      } else {
+        alert("Máximo " + (s.max || 3) + " opciones 😉");
+        return;
+      }
+
+      ans[s.id] = values;
+      tag.classList.toggle("on", values.includes(i));
+    };
+
+    wrap.appendChild(tag);
+  });
+
+  return wrap;
+}
+
+function single(s) {
+  const wrap = document.createElement("div");
+
+  s.options.forEach((txt, i) => {
+    const label = document.createElement("label");
+    label.className = "option";
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = s.id;
+    input.checked = ans[s.id] === i;
+    input.onchange = () => ans[s.id] = i;
+
+    const span = document.createElement("span");
+    span.textContent = txt;
+
+    label.append(input, span);
+    wrap.appendChild(label);
+  });
+
+  return wrap;
+}
+
+function saveCurrent(s) {
+  if (s.type === "rank") {
+    const list = app.querySelector(".rank");
+    if (list) ans[s.id] = [...list.children].map(el => Number(el.dataset.i));
   }
 }
-function rank(s){
- const w=document.createElement("div"),tip=document.createElement("div");tip.className="tip";tip.textContent="☝️ "+s.instruction;w.appendChild(tip);
- const l=document.createElement("div");l.className="rank";let order=ans[s.id]||s.options.map((_,i)=>i);
- order.forEach(i=>l.appendChild(makeItem(s.options[i],i,l)));w.appendChild(l);return w;
-}
-function makeItem(txt,i,l){
- const e=document.createElement("div");e.className="item";e.draggable=true;e.dataset.i=i;
- e.innerHTML=`<span class="handle">☰</span><span class="num"></span><span class="label">${txt}</span>`;
- e.addEventListener("dragstart",()=>e.classList.add("dragging"));
- e.addEventListener("dragend",()=>{e.classList.remove("dragging");nums(l)});
- e.addEventListener("dragover",ev=>{ev.preventDefault();const d=l.querySelector(".dragging");if(!d||d===e)return;const r=e.getBoundingClientRect();l.insertBefore(d,ev.clientY>r.top+r.height/2?e.nextSibling:e);nums(l)});
- return e;
-}
-function nums(l){[...l.children].forEach((e,i)=>e.querySelector(".num").textContent=i+1)}
-function multi(s){
- const w=document.createElement("div");w.className="tags";const selected=ans[s.id]||[];
- s.options.forEach((txt,i)=>{let t=document.createElement("div");t.className="tag"+(selected.includes(i)?" on":"");t.textContent=txt;t.onclick=()=>{let a=ans[s.id]||[];if(a.includes(i)){a=a.filter(x=>x!==i);t.classList.remove("on")}else if(a.length<(s.max||3)){a=[...a,i];t.classList.add("on")}else{alert("Máximo "+(s.max||3)+" opciones 😉");return}ans[s.id]=a};w.appendChild(t)});return w;
-}
-function single(s){
- const w=document.createElement("div");s.options.forEach((txt,i)=>{let l=document.createElement("label");l.className="option";l.innerHTML=`<input type="radio" name="${s.id}" ${ans[s.id]===i?"checked":""}><span>${txt}</span>`;l.querySelector("input").onchange=()=>ans[s.id]=i;w.appendChild(l)});return w;
-}
-function go(s){
- if(s.type==="rank"){const l=document.querySelector(".rank");ans[s.id]=[...l.children].map(e=>+e.dataset.i)}
- if(s.type==="single" && ans[s.id]===undefined)return warn();
- if(s.type==="multi" && !(ans[s.id]&&ans[s.id].length))return warn();
- step++;render();
-}
-function warn(){const c=document.querySelector(".card");c.classList.add("shake");setTimeout(()=>c.classList.remove("shake"),300);alert("Escoge al menos una opción antes de continuar 💜")}
 
+function go(s) {
+  saveCurrent(s);
+
+  if (s.type === "single" && ans[s.id] === undefined) {
+    alert("Escoge una opción antes de continuar 💜");
+    return;
+  }
+
+  if (s.type === "multi" && !(ans[s.id] && ans[s.id].length)) {
+    alert("Escoge al menos una opción 💜");
+    return;
+  }
+
+  step++;
+  render();
+}
 
 async function result() {
+  ptext.textContent = "¡Completado!";
+  fill.style.width = "100%";
+
   app.innerHTML = `
     <section class="card result">
       <p class="big">💜</p>
@@ -161,12 +292,13 @@ async function result() {
   const datos = { answers: {} };
 
   cfg.sections.forEach(s => {
-    const respuesta = ans[s.id];
+    const value = ans[s.id];
 
     if (s.type === "rank" || s.type === "multi") {
-      datos.answers[s.title] = respuesta.map(i => s.options[i]);
+      datos.answers[s.title] = (value || []).map(i => s.options[i]);
     } else {
-      datos.answers[s.title] = s.options[respuesta];
+      datos.answers[s.title] =
+        value === undefined ? "" : s.options[value];
     }
   });
 
@@ -174,16 +306,14 @@ async function result() {
     await fetch(SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8"
-      },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(datos)
     });
   } catch (error) {
-    console.error("No se pudieron enviar las respuestas", error);
+    console.error("Error enviando las respuestas:", error);
   }
 }
- 
+
 render();
 </script>
 </body>
