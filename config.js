@@ -1,5 +1,5 @@
 const QUIZ_CONFIG = {
-  title: "Un cumple de gustos 🎂",
+  title: "Un cumple feliz 🎂",
   subtitle: "Por favor ayuda esta pobre ser humana en crisis que quiere celebrar esta linda fecha",
   intro: "Responde según lo que realmente te provoque, mi sueldo puede con todo",
 
