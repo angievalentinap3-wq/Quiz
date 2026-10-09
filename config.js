@@ -8,6 +8,7 @@ const QUIZ_CONFIG = {
       id: "mood",
       emoji: "✨",
       title: "Pensando en qué mood estás para HOY",
+      description: "",
       type: "rank",
       instruction: "Arrastra y deja primero lo que más te gustaría.",
       options: [
@@ -23,6 +24,7 @@ const QUIZ_CONFIG = {
       id: "food",
       emoji: "🍽️",
       title: "Teniendo en cuenta tu sistema gastrointestinal reciente, piensa qué quieres comer este finde",
+      description: "",
       type: "rank",
       instruction: "Ordénalas de más antojada a menos antojada.",
       options: [
@@ -40,7 +42,7 @@ const QUIZ_CONFIG = {
       id: "plans",
       emoji: "🎉",
       title: "Planes pa mañanaaa",
-      description: "Imagina que tienes varias opciones para pasar una tarde/noche especial.",
+      description: "",
       type: "rank",
       instruction: "Ordena en orden según el plan que más te emocionaría.",
       options: [
@@ -59,6 +61,7 @@ const QUIZ_CONFIG = {
       emoji: "🍿",
       title: "Bueno esto es por si marcaste como un plan chevere ir a cine, 
       description: "Si aparecieran estas películas en cartelera, ¿cuáles te llamarían la atención? Puedes escoger hasta 3.",
+      description: "",
       type: "multi",
       instruction: "cuáles te gustarían? Puedes escoger hasta 3 y tranqui que obvio no incluí de terror",
       max: 3,
