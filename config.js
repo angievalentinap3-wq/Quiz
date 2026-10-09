@@ -10,13 +10,13 @@ const QUIZ_CONFIG = {
       title: "Pensando en qué mood estás para HOY",
       description: "",
       type: "rank",
-      instruction: "Arrastra y deja primero lo que más te gustaría.",
+      instruction: "Arrastra y deja primero lo que más te gustaría",
       options: [
         "💃 Tomar en un barcito, puede terminar en nuestra primera rumba juntas solas",
         "🏠 Plan casita: juegos + comida + algo para tomar",
         "🎬 Ir a cineeeeee",
         "🛍️ Salir de compritass por ahí",
-        "🍽️ Irnos a comer por fueraaa",
+        "🍽️ Irnos a comer por fueraaa"
       ]
     },
 
