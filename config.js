@@ -44,7 +44,7 @@ const QUIZ_CONFIG = {
       title: "Planes pa mañanaaa",
       description: "",
       type: "rank",
-      instruction: "Ordena según el plan que más te emocionaría.",
+      instruction: "Q se te antoja",
       options: [
         "🍸 Barcito para hablar y tomar algo",
         "💃 Discotequear juntas",
